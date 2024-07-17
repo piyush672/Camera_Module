@@ -2,36 +2,35 @@ import React, { useEffect, useState } from 'react'
 import { Button, Image, PermissionsAndroid, View } from 'react-native'
 import { NativeModules } from "react-native";
 
-const { CameraModule } = NativeModules
+const { CameraModule, CustomGalleryPermission } = NativeModules
 
 
 function App() {
   const [imageUri, setImageUri] = useState("");
   async function getPermission() {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.CAMERA,
-      {
-        title: 'Cool Photo App Camera Permission',
-        message:
-          'Cool Photo App needs access to your camera ' +
-          'so you can take awesome pictures.',
-        buttonNeutral: 'Ask Me Later',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      },
+    await PermissionsAndroid.requestMultiple(
+      [PermissionsAndroid.PERMISSIONS.CAMERA, PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE],
     );
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log('You can use the camera');
-    } else {
-      console.log('Camera permission denied');
-    }
   }
 
   async function takePicture() {
-    const granted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CAMERA)
+    const granted = await CustomGalleryPermission.requestStoragePermission()
 
     if (granted) {
       CameraModule.onClickCamera()
+        .then((uri: string) => {
+          console.log("uri is", uri)
+          setImageUri(uri)
+        })
+        .catch((error: any) => console.log("error is", error))
+    }
+  }
+
+  async function pickFromGallery() {
+    const granted = await CustomGalleryPermission.requestStoragePermission()
+
+    if (granted) {
+      CameraModule.onPickFromGallery()
         .then((uri: string) => {
           console.log("uri is", uri)
           setImageUri(uri)
@@ -51,6 +50,7 @@ function App() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Button title='Click photo' onPress={takePicture} />
+      <Button title='Pick from gallery' onPress={pickFromGallery} />
       {imageUri && (
         <Image
           source={{ uri: imageUri }}

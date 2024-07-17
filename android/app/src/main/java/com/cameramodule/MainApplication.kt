@@ -10,7 +10,8 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
-import com.cameramodule.cameraModule.CameraPackage
+import com.cameramodule.ImagePicker.ImagePickerPackage
+import com.farmart.pro.Permission.CustomPermissionPackage
 
 class MainApplication : Application(), ReactApplication {
 
@@ -21,7 +22,8 @@ class MainApplication : Application(), ReactApplication {
               // Packages that cannot be autolinked yet can be added manually here, for example:
               // add(MyReactNativePackage())
               //registering the module for camera
-                add(CameraPackage())
+                add(ImagePickerPackage())
+                add(CustomPermissionPackage())
             }
 
         override fun getJSMainModuleName(): String = "index"
